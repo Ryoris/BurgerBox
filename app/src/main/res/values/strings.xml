@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">BurgerBox</string>
-    <string name="action_favorite">action_favorite</string>
-    <string name="action_settings">action_settings</string>
+    <string name="soundboard">Soundboard</string>
+    <string name="importer_un_son">Importer un son</string>
+    <string name="générer_un_son">Générer un son</string>
+    <string name="lore_du_burger">Lore du burger</string>
 </resources>

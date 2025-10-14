@@ -43,10 +43,16 @@ public class MainActivity extends AppCompatActivity {
 
             popupMenu.setOnMenuItemClickListener(item -> {
                 int id = item.getItemId();
-                if (id == R.id.action_favorite) {
+                if (id == R.id.soundboard) {
 
                     return true;
-                } else if (id == R.id.action_settings) {
+                } else if (id == R.id.importer_un_son) {
+
+                    return true;
+                } else if (id == R.id.générer_un_son) {
+
+                    return true;
+                } else if (id == R.id.lore_du_burger) {
 
                     return true;
                 }
@@ -55,24 +61,6 @@ public class MainActivity extends AppCompatActivity {
 
             popupMenu.show();
         });
-
-
-    }
-
-
-
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId()==R.id.action_settings){
-            return true;
-        }
-        else if(item.getItemId()==R.id.action_settings){
-            return true;
-        }
-
-            return super.onOptionsItemSelected(item);
 
 
     }
