@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.PopupMenu;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,15 +32,36 @@ public class MainActivity extends AppCompatActivity {
         });
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
+        myToolbar.setNavigationIcon(R.drawable.baseline_reorder_20);
+
+
+        myToolbar.setNavigationOnClickListener(v -> {
+            PopupMenu popupMenu = new PopupMenu(MainActivity.this, v);
+            MenuInflater inflater = popupMenu.getMenuInflater();
+            inflater.inflate(R.menu.action_buttons, popupMenu.getMenu());
+
+            // Gérer les clics sur les items du menu
+            popupMenu.setOnMenuItemClickListener(item -> {
+                int id = item.getItemId();
+                if (id == R.id.action_favorite) {
+
+                    return true;
+                } else if (id == R.id.action_settings) {
+
+                    return true;
+                }
+                return false;
+            });
+
+            popupMenu.show(); // 💥 Affiche le menu à gauche
+        });
+
+
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.action_buttons, menu);
-        return true;
-    }
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
