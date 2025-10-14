@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
             MenuInflater inflater = popupMenu.getMenuInflater();
             inflater.inflate(R.menu.action_buttons, popupMenu.getMenu());
 
-            // Gérer les clics sur les items du menu
+
             popupMenu.setOnMenuItemClickListener(item -> {
                 int id = item.getItemId();
                 if (id == R.id.action_favorite) {
@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             });
 
-            popupMenu.show(); // 💥 Affiche le menu à gauche
+            popupMenu.show();
         });
 
 
