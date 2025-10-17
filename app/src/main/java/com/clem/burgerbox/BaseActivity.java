@@ -51,7 +51,8 @@ public abstract class BaseActivity extends AppCompatActivity {
                     // TODO: implémenter
                     return true;
                 } else if (id == R.id.générer_un_son) {
-                    // TODO: implémenter
+                    startActivity(new Intent(this, Generer_son.class));
+                    finish();
                     return true;
                 } else if (id == R.id.lore_du_burger) {
                     startActivity(new Intent(this, Lore_du_burger.class));
