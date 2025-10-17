@@ -2,4 +2,20 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="fire_red">#D23D2D</color>
+    <color name="vanilla_cream">#F8EECB</color>
+    <color name="saffron">#F5C065</color>
+    <color name="retro_green">#31603D</color>
+    <color name="russet">#6E433D</color>
+
+    <!-- Alias pour Material Design -->
+    <color name="colorPrimary">@color/retro_green</color>
+    <color name="colorPrimaryDark">@color/russet</color>
+    <color name="colorAccent">@color/fire_red</color>
+
+    <!-- Texte -->
+    <color name="text_primary">@color/russet</color>
+    <color name="text_on_primary">@android:color/white</color>
+    <color name="text_on_light">@android:color/black</color>
 </resources>

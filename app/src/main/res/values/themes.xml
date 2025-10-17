@@ -1,16 +1,55 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.BurgerBox" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+
+    <style name="Theme.BurgerBox" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Couleurs principales -->
+        <item name="colorPrimary">@color/russet</item>
+        <item name="colorPrimaryVariant">@color/russet</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+
+        <item name="colorSecondary">@color/fire_red</item>
+        <item name="colorSecondaryVariant">@color/saffron</item>
+        <item name="colorOnSecondary">@android:color/white</item>
+
+        <!-- Fond par défaut -->
+        <item name="android:windowBackground">@color/vanilla_cream</item>
+        <item name="colorSurface">@color/vanilla_cream</item>
+        <item name="colorBackgroundFloating">@color/vanilla_cream</item>
+        <item name="colorOnBackground">@color/retro_green</item>
+
+        <!-- Texte -->
+        <item name="android:textColor">@color/russet</item>
+        <item name="android:textColorPrimary">@color/russet</item>
+        <item name="android:textColorSecondary">@color/retro_green</item>
+
+        <!-- Toolbar -->
+        <item name="toolbarStyle">@style/Widget.BurgerBox.Toolbar</item>
+
+        <!-- Boutons -->
+        <item name="materialButtonStyle">@style/Widget.BurgerBox.Button</item>
+
+        <!-- Polices et coins -->
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.MediumComponent</item>
     </style>
 
-    <style name="Theme.BurgerBox" parent="Base.Theme.BurgerBox" />
-    <!-- Base application theme. -->
-    <style name="Base.Theme.AppCompat.Light.NoActionBar" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    <!-- Toolbar personnalisée -->
+    <style name="Widget.BurgerBox.Toolbar" parent="Widget.MaterialComponents.Toolbar">
+        <item name="android:background">@color/retro_green</item>
+        <item name="titleTextColor">@android:color/white</item>
+        <item name="subtitleTextColor">@color/saffron</item>
+        <item name="navigationIconTint">@android:color/white</item>
     </style>
 
-    <style name="Theme.AppCompat.Light.NoActionBar" parent="Base.Theme.AppCompat.Light.NoActionBar" />
+    <!-- Bouton principal -->
+    <style name="Widget.BurgerBox.Button" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@color/fire_red</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="rippleColor">@color/saffron</item>
+    </style>
+
+    <!-- Coins arrondis généraux -->
+    <style name="ShapeAppearance.MediumComponent" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12dp</item>
+    </style>
 </resources>
