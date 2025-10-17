@@ -1,10 +1,11 @@
 package com.clem.burgerbox;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.ContextThemeWrapper;
 import android.view.MenuInflater;
 import android.widget.FrameLayout;
-import android.widget.PopupMenu;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.LayoutRes;
@@ -13,6 +14,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.appcompat.widget.PopupMenu;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
@@ -37,7 +39,10 @@ public abstract class BaseActivity extends AppCompatActivity {
         // Icône et menu "hamburger"
         myToolbar.setNavigationIcon(R.drawable.baseline_reorder_20);
         myToolbar.setNavigationOnClickListener(v -> {
-            PopupMenu popupMenu = new PopupMenu(BaseActivity.this, v);
+
+            Context wrapper = new ContextThemeWrapper(BaseActivity.this, R.style.PopupMenuYellow);
+            PopupMenu popupMenu = new PopupMenu(wrapper, v);
+
             MenuInflater inflater = popupMenu.getMenuInflater();
             inflater.inflate(R.menu.action_buttons, popupMenu.getMenu());
 

@@ -52,4 +52,9 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">12dp</item>
     </style>
+
+    <style name="PopupMenuYellow" parent="@style/Widget.AppCompat.PopupMenu">
+        <item name="popupMenuBackground">@drawable/popup_yellow</item>
+    </style>
+
 </resources>

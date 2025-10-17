@@ -15,7 +15,7 @@
 
         <TextView
             android:id="@+id/titleText"
-            android:hint="Enregistrer un son"
+            android:text="Enregistrer un son"
             android:textSize="22sp"
             android:textStyle="bold"
             android:layout_width="match_parent"
@@ -25,7 +25,7 @@
 
         <EditText
             android:id="@+id/inputText"
-            android:hint="Texte à dire…"
+            android:text="Texte à dire…"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 

@@ -23,7 +23,7 @@ public class Generer_son extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.generer_son);
+        setActivityLayout(R.layout.generer_son);
 
     }
 }
