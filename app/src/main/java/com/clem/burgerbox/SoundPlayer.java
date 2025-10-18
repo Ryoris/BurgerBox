@@ -1,10 +1,16 @@
 package com.clem.burgerbox;
 
 import android.content.Context;
+import android.content.res.AssetFileDescriptor;
 import android.media.AudioAttributes;
 import android.media.SoundPool;
+import android.net.Uri;
 import android.util.SparseBooleanArray;
 import android.util.SparseIntArray;
+import android.widget.Toast;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SoundPlayer {
 
@@ -13,6 +19,9 @@ public class SoundPlayer {
     private final SparseIntArray soundIds;
     private final SparseBooleanArray toAutoPlay;
     private final Context appContext;
+
+    private final Map<String, Integer> uriSoundIds = new HashMap<>();
+
 
     private SoundPlayer(Context context) {
         appContext = context.getApplicationContext();
@@ -53,6 +62,24 @@ public class SoundPlayer {
             soundPool.play(soundId, 1f, 1f, 1, 0, 1f);
         }
     }
+    public void play(Uri uri) {
+        String key = uri.toString();
+        Integer existing = uriSoundIds.get(key);
+        if (existing != null) {
+            soundPool.play(existing, 1f, 1f, 1, 0, 1f);
+            return;
+        }
+        try (AssetFileDescriptor afd = appContext.getContentResolver()
+                .openAssetFileDescriptor(uri, "r")) {
+            if (afd == null) return;
+            int soundId = soundPool.load(afd, 1);
+            uriSoundIds.put(key, soundId);
+            toAutoPlay.put(soundId, true);
+        } catch (Exception e) {
+            Toast.makeText(appContext, "Impossible de charger ce son", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
     public void release() {
         soundPool.release();

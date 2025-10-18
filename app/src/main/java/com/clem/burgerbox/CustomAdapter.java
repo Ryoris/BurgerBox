@@ -3,6 +3,7 @@ package com.clem.burgerbox;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,7 +59,7 @@ public class CustomAdapter extends BaseAdapter {
 
         // Bouton 1
         holder.button1.setText(item.getAudio1().getTitle());
-        holder.button1.setOnClickListener(v -> playByTitle(item.getAudio1().getTitle()));
+        holder.button1.setOnClickListener(v -> play(item.getAudio1()));
 
         // Bouton 2 (peut être null)
         if (item.getAudio2() == null) {
@@ -67,7 +68,7 @@ public class CustomAdapter extends BaseAdapter {
         } else {
             holder.button2.setVisibility(View.VISIBLE);
             holder.button2.setText(item.getAudio2().getTitle());
-            holder.button2.setOnClickListener(v -> playByTitle(item.getAudio2().getTitle()));
+            holder.button2.setOnClickListener(v -> play(item.getAudio2()));
         }
         return convertView;
     }
@@ -89,6 +90,21 @@ public class CustomAdapter extends BaseAdapter {
         }
     }
 
+    private void play(Audio audio) {
+        AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        if (am != null && am.getStreamVolume(AudioManager.STREAM_MUSIC) == 0) {
+            Toast.makeText(context, "Volume média à 0 🔇", Toast.LENGTH_SHORT).show();
+        }
+
+        if (audio.isFromUri()) {
+            Uri uri = Uri.parse(audio.getUri());
+            SoundPlayer.get(context).play(uri);
+        } else {
+            playByTitle(audio.getTitle());
+        }
+    }
+
+
     // Correspondance entre l'id et le nom
     @SuppressLint("DiscouragedApi")
     private int resolveRawResId(Context ctx, String displayName) {
@@ -102,5 +118,10 @@ public class CustomAdapter extends BaseAdapter {
     static class ViewHolder {
         Button button1;
         Button button2;
+    }
+    public void updateData(ArrayList<TwoAudio> newData) {
+        this.listData.clear();
+        this.listData.addAll(newData);
+        notifyDataSetChanged();
     }
 }
