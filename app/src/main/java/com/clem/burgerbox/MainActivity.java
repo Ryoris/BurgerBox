@@ -43,9 +43,7 @@ public class MainActivity extends BaseActivity {
                         Uri uri = result.getData().getData();
                         if (uri != null) {
                             // Conserver l’accès au-delà du redémarrage de l’app
-                            final int flags = result.getData().getFlags()
-                                    & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                            getContentResolver().takePersistableUriPermission(uri, flags & Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
                             // Nom “humain” basé sur le fichier
                             String title = queryDisplayName(uri);
@@ -78,11 +76,8 @@ public class MainActivity extends BaseActivity {
     }
 
     private String queryDisplayName(Uri uri) {
-        Cursor c = getContentResolver().query(uri, new String[]{OpenableColumns.DISPLAY_NAME}, null, null, null);
-        try {
+        try (Cursor c = getContentResolver().query(uri, new String[]{OpenableColumns.DISPLAY_NAME}, null, null, null)) {
             if (c != null && c.moveToFirst()) return c.getString(0);
-        } finally {
-            if (c != null) c.close();
         }
         return null;
     }
