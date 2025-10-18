@@ -2,7 +2,7 @@ package com.clem.burgerbox;
 
 public class Audio {
 
-    private String title;
+    private final String title;
     public Audio(String title){
         this.title=title;
     }

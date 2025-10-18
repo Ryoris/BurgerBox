@@ -2,6 +2,7 @@ package com.clem.burgerbox;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.media.AudioManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +40,6 @@ public class CustomAdapter extends BaseAdapter {
         return position;
     }
 
-    @SuppressLint("InflateParams")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
@@ -74,6 +74,13 @@ public class CustomAdapter extends BaseAdapter {
 
     // Lance la lecture du son
     private void playByTitle(String title) {
+        // check le volume avant de lancer le son
+        AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        int vol = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+        if (vol == 0) {
+            Toast.makeText(context, "Volume média à 0 🔇", Toast.LENGTH_SHORT).show();
+            return;
+        }
         int resId = resolveRawResId(context, title);
         if (resId != 0) {
             SoundPlayer.get(context).play(resId);
