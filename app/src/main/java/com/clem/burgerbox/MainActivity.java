@@ -12,6 +12,7 @@ import android.widget.ListView;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 public class MainActivity extends BaseActivity {
@@ -25,10 +26,7 @@ public class MainActivity extends BaseActivity {
         setActivityLayout(R.layout.activity_main);
 
         // Liste de sons par défaut
-        soundsList = new ArrayList<>();
-        soundsList.add(new Audio("big_bell"));
-        soundsList.add(new Audio("fart1"));
-        soundsList.add(new Audio("throwing"));
+        soundsList = loadDefaultSounds();
 
         ArrayList<TwoAudio> twoSoundsList = TwoAudio.createTwoAudioArrays(soundsList);
         adapter = new CustomAdapter(this, twoSoundsList);
@@ -80,6 +78,24 @@ public class MainActivity extends BaseActivity {
             if (c != null && c.moveToFirst()) return c.getString(0);
         }
         return null;
+    }
+
+
+    private ArrayList<Audio> loadDefaultSounds() {
+        ArrayList<Audio> list = new ArrayList<>();
+
+        try {
+            // Récupère tous les champs de la classe R.raw
+            Field[] fields = R.raw.class.getFields();
+            for (Field f : fields) {
+                String name = f.getName(); // exemple : "big_bell"
+                list.add(new Audio(name)); // tu peux garder le nom brut, ou formater pour l'affichage
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
     }
 
     @Override
