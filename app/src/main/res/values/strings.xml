@@ -42,4 +42,6 @@
 
         “Travaille bien, mais n’oublie pas de manger chaud.”
     </string>
+    <string name="add_sound" />
+    <string name="plus">+</string>
 </resources>

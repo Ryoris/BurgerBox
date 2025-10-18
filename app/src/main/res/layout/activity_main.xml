@@ -10,11 +10,28 @@
     <ListView
         android:id="@+id/listview_1"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="198dp"
+        tools:layout_editor_absoluteY="16dp" />
     
         <!--
         app:menu="@menu/action_buttons"
         -->
+    <Button
+        android:id="@+id/btn_add_sound"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:background="@drawable/rounded_button"
+        android:elevation="6dp"
+        android:gravity="center"
+        android:text="@string/plus"
+        android:textSize="25sp"
+        android:textColor="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:backgroundTint="@null" />       <!-- Impose la couleur -->
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

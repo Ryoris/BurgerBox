@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.ContextThemeWrapper;
 import android.view.MenuInflater;
 import android.widget.FrameLayout;
-
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.LayoutRes;
 import androidx.appcompat.app.AppCompatActivity;
@@ -52,10 +51,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                     startActivity(new Intent(this, MainActivity.class));
                     finish();
                     return true;
-                } else if (id == R.id.importer_un_son) {
-                    // TODO: implémenter
-                    return true;
-                } else if (id == R.id.générer_un_son) {
+                } else if (id == R.id.generer_un_son) {
                     startActivity(new Intent(this, Generer_son.class));
                     finish();
                     return true;
