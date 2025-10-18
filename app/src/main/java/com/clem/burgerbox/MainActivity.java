@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
+import android.util.Log;
 import android.widget.ListView;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -92,7 +93,7 @@ public class MainActivity extends BaseActivity {
                 list.add(new Audio(name)); // tu peux garder le nom brut, ou formater pour l'affichage
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("MainActivity", "Erreur lors du chargement des sons par défaut", e);
         }
 
         return list;
