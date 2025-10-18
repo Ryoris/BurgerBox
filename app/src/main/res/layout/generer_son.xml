@@ -29,28 +29,49 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <RadioGroup
-            android:id="@+id/rgGender"
-            android:orientation="horizontal"
+        <!-- Bloc vitesse -->
+        <TextView
+            android:id="@+id/tvRateLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Vitesse : 1.00x"
+            android:layout_marginTop="16dp"
+            android:textStyle="bold"/>
+
+        <SeekBar
+            android:id="@+id/seekRate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="200"
+            android:progress="100" />
+
+        <!-- Bloc pitch -->
+        <TextView
+            android:id="@+id/tvPitchLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Pitch : 1.00x"
             android:layout_marginTop="12dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <RadioButton
-                android:id="@+id/rbFemale"
-                android:checked="true"
-                android:text="Femme"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <RadioButton
-                android:id="@+id/rbMale"
-                android:text="Homme"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        </RadioGroup>
+            android:textStyle="bold"/>
+
+        <SeekBar
+            android:id="@+id/seekPitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="200"
+            android:progress="100" />
+
 
         <Button
-            android:id="@+id/btnSpeak"
+            android:id="@+id/btnPlay"
             android:text="Parler"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp" />
+
+        <Button
+            android:id="@+id/btnSave"
+            android:text="Enregistrer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp" />
