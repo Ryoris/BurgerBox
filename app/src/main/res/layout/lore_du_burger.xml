@@ -27,10 +27,10 @@
             android:id="@+id/lore_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:lineSpacingExtra="4dp"
             android:text="@string/histoire_burger"
-            android:textSize="18sp"
-            android:layout_marginBottom="8dp"/>
+            android:textSize="18sp" />
 
         <ImageView
             android:id="@+id/imgLogo"
