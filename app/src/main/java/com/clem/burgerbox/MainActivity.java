@@ -2,7 +2,6 @@ package com.clem.burgerbox;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,6 +11,7 @@ import android.widget.ListView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -26,36 +26,39 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setActivityLayout(R.layout.activity_main);
 
-        // Liste de sons par défaut
+        // 1) Construire la liste: défauts + persistés
         soundsList = loadDefaultSounds();
+        soundsList.addAll(SoundStore.load(this));
 
+        // 2) Adapter
         ArrayList<TwoAudio> twoSoundsList = TwoAudio.createTwoAudioArrays(soundsList);
         adapter = new CustomAdapter(this, twoSoundsList);
         ListView soundsListView = findViewById(R.id.listview_1);
         soundsListView.setAdapter(adapter);
 
-        // Init du picker
+        // 3) Picker pour ajouter un son
         pickAudioLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                         Uri uri = result.getData().getData();
                         if (uri != null) {
-                            // Conserver l’accès au-delà du redémarrage de l’app
+                            // 1) Conserver l’accès à l’URI au-delà des redémarrages
                             getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
                             // Nom “humain” basé sur le fichier
                             String title = queryDisplayName(uri);
                             if (title == null || title.trim().isEmpty()) title = "nouveau_son";
 
-                            // Ajouter à la source de données
+                            // 2) Ajouter à la liste en mémoire
                             soundsList.add(new Audio(title, uri.toString()));
-                            // Recréer la liste 2-par-2 et rafraîchir l’adapter
-                            ArrayList<TwoAudio> refreshed = TwoAudio.createTwoAudioArrays(soundsList);
-                            adapter.updateData(refreshed);   // -> ajoute une méthode dans l’adapter (voir plus bas)
 
-                            // (Optionnel) Persister l’URI et le titre
-                            persistSound(title, uri);
+                            // 3) Rafraîchir l’UI
+                            ArrayList<TwoAudio> refreshed = TwoAudio.createTwoAudioArrays(soundsList);
+                            adapter.updateData(refreshed);
+
+                            // 4) Sauvegarder en JSON via SoundStore (ne persiste que les sons utilisateur)
+                            SoundStore.save(this, onlyUserSounds(soundsList));
                         }
                     }
                 }
@@ -66,12 +69,21 @@ public class MainActivity extends BaseActivity {
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.setType("audio/*"); // mp3/ogg/wav…
+            intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);  //permission stockage au démarrage
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             pickAudioLauncher.launch(intent);
         });
     }
-    private void persistSound(String title, Uri uri) {
-        SharedPreferences sp = getSharedPreferences("sounds", MODE_PRIVATE);
-        sp.edit().putString(title, uri.toString()).apply();
+
+    @Override protected void onStop() {
+        super.onStop();
+        SoundStore.save(this, onlyUserSounds(soundsList));
+    }
+
+    private ArrayList<Audio> onlyUserSounds(ArrayList<Audio> all) {
+        ArrayList<Audio> res = new ArrayList<>();
+        for (Audio a : all) if (a.isFromUri()) res.add(a);
+        return res;
     }
 
     private String queryDisplayName(Uri uri) {
