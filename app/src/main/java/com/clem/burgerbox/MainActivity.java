@@ -114,14 +114,16 @@ public class MainActivity extends BaseActivity {        // Hérite de la toolbar
         return null;
     }
 
-    // Charger les sons par défaut
+    // Charger et trie les sons par défaut
     private ArrayList<Audio> loadDefaultSounds() {
         ArrayList<Audio> list = new ArrayList<>();
-
         try {
             Field[] fields = R.raw.class.getFields();     // Récupère tous les champs de la classe R.raw
-            for (Field f : fields) {
-                String name = f.getName();
+            ArrayList<String> names = new ArrayList<>();
+            for (Field f : fields) names.add(f.getName());
+
+            java.util.Collections.sort(names, String.CASE_INSENSITIVE_ORDER);   // Tri A-Z
+            for (String name : names) {     // Construit les Audio avec l'id de res
                 list.add(new Audio(name));
             }
         } catch (Exception e) {
@@ -130,6 +132,7 @@ public class MainActivity extends BaseActivity {        // Hérite de la toolbar
 
         return list;
     }
+
 
     // Libérer le lecteur de sons
     @Override

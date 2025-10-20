@@ -61,8 +61,12 @@ public class CustomAdapter extends BaseAdapter {
         TwoAudio item = listData.get(position);
 
         // Bouton 1
-        holder.button1.setText(item.getAudio1().getTitle());
-        holder.button1.setOnClickListener(v -> play(item.getAudio1()));
+        Audio a1 = item.getAudio1();
+        if (a1 != null) {
+            holder.button1.setText(a1.isFromUri() ? a1.getTitle() : humanize(a1.getTitle()));
+            holder.button1.setOnClickListener(v -> play(a1));
+        }
+
 
         // appui long pour supprimer si c'est un import
         holder.button1.setOnLongClickListener(v -> {
@@ -80,13 +84,14 @@ public class CustomAdapter extends BaseAdapter {
         });
 
         // Bouton 2 (peut être null)
-        if (item.getAudio2() == null) {
+        Audio a2 = item.getAudio2();
+        if (a2 == null) {
             holder.button2.setVisibility(View.GONE);
             holder.button2.setOnClickListener(null);
         } else {
             holder.button2.setVisibility(View.VISIBLE);
-            holder.button2.setText(item.getAudio2().getTitle());
-            holder.button2.setOnClickListener(v -> play(item.getAudio2()));
+            holder.button2.setText(a2.isFromUri() ? a2.getTitle() : humanize(a2.getTitle()));
+            holder.button2.setOnClickListener(v -> play(a2));
 
             holder.button2.setOnLongClickListener(v -> {
                 Audio a = item.getAudio2();
@@ -159,5 +164,21 @@ public class CustomAdapter extends BaseAdapter {
 
     public interface OnAudioAction {
         void onDelete(Audio audio);
+    }
+
+
+    // Formate les noms des audios
+    // Transforme "big_bell" -> "Big Bell", "AIR-HORN" -> "Air Horn"
+    private static String humanize(String raw) {
+        if (raw == null || raw.isEmpty()) return "";
+        String[] parts = raw.replace('-', '_').split("_");
+        StringBuilder sb = new StringBuilder();
+        for (String p : parts) {
+            if (p.isEmpty()) continue;
+            sb.append(Character.toUpperCase(p.charAt(0)))
+                    .append(p.substring(1).toLowerCase())
+                    .append(' ');
+        }
+        return sb.toString().trim();
     }
 }
