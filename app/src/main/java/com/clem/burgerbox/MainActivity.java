@@ -66,8 +66,19 @@ public class MainActivity extends BaseActivity {        // Hérite de la toolbar
                         Uri uri = result.getData().getData();
                         if (uri != null) {
 
+                            // Verifie si le son est déjà présent dans la liste
+                            if (containsUri(soundsList, uri)) {
+                                Toast.makeText(this, "Ce son est déjà dans la liste", Toast.LENGTH_SHORT).show();
+                                return; // on n'ajoute pas
+                            }
+
                             // IMPORTANT : Conserver l’accès à l’URI au-delà des redémarrages
-                            getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            try {
+                                getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            } catch (SecurityException se) {
+                                Toast.makeText(this, "Accès refusé à ce fichier", Toast.LENGTH_SHORT).show();
+                                return; // stoppe ici si la permission échoue
+                            }
 
                             String title = queryDisplayName(uri);       // attribution du nom basé sur le fichier
                             if (title == null || title.trim().isEmpty()) title = "nouveau_son";
@@ -122,7 +133,7 @@ public class MainActivity extends BaseActivity {        // Hérite de la toolbar
             ArrayList<String> names = new ArrayList<>();
             for (Field f : fields) names.add(f.getName());
 
-            java.util.Collections.sort(names, String.CASE_INSENSITIVE_ORDER);   // Tri A-Z
+            names.sort(String.CASE_INSENSITIVE_ORDER);   // Tri A-Z
             for (String name : names) {     // Construit les Audio avec l'id de res
                 list.add(new Audio(name));
             }
@@ -133,6 +144,15 @@ public class MainActivity extends BaseActivity {        // Hérite de la toolbar
         return list;
     }
 
+    // Cherche un son pour voir s'il existe déjà
+    private boolean containsUri(ArrayList<Audio> list, Uri uri) {
+        if (uri == null) return false;
+        String key = uri.toString();
+        for (Audio a : list) {
+            if (a.isFromUri() && key.equals(a.getUri())) return true;
+        }
+        return false;
+    }
 
     // Libérer le lecteur de sons
     @Override
