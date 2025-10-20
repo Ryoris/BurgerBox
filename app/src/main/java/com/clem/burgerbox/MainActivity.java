@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.provider.OpenableColumns;
 import android.util.Log;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -32,7 +33,32 @@ public class MainActivity extends BaseActivity {
 
         // 2) Adapter
         ArrayList<TwoAudio> twoSoundsList = TwoAudio.createTwoAudioArrays(soundsList);
-        adapter = new CustomAdapter(this, twoSoundsList);
+        adapter = new CustomAdapter(
+                this,
+                twoSoundsList,
+                audio -> { // <- callback OnAudioAction.onDelete
+                    // 1) Retirer de la source
+                    if (audio != null && audio.isFromUri()) {
+                        // supprime l'entrée équivalente par URI
+                        String key = audio.getUri();
+                        for (int i = soundsList.size() - 1; i >= 0; i--) {
+                            Audio a = soundsList.get(i);
+                            if (a.isFromUri() && key.equals(a.getUri())) {
+                                soundsList.remove(i);
+                            }
+                        }
+                        // 2) Sauvegarder la nouvelle liste utilisateur
+                        SoundStore.save(this, onlyUserSounds(soundsList));
+
+                        // 3) Rafraîchir la liste 2-par-2 + adapter
+                        ArrayList<TwoAudio> refreshed = TwoAudio.createTwoAudioArrays(soundsList);
+                        adapter.updateData(refreshed);
+
+                        // 4) Feedback
+                        Toast.makeText(this, "Son supprimé ✅", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
         ListView soundsListView = findViewById(R.id.listview_1);
         soundsListView.setAdapter(adapter);
 

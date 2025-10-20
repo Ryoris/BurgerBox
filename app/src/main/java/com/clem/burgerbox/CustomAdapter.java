@@ -18,11 +18,13 @@ public class CustomAdapter extends BaseAdapter {
     private final ArrayList<TwoAudio> listData;
     private final LayoutInflater layoutInflater;
     private final Context context;
+    private final OnAudioAction action;
 
-    public CustomAdapter(Context context, ArrayList<TwoAudio> listData) {
+    public CustomAdapter(Context context, ArrayList<TwoAudio> listData, OnAudioAction action) {
         this.listData = listData;
-        layoutInflater = LayoutInflater.from(context);
+        this.layoutInflater = LayoutInflater.from(context);
         this.context = context;
+        this.action = action;
     }
 
     // Méthode de base
@@ -62,6 +64,21 @@ public class CustomAdapter extends BaseAdapter {
         holder.button1.setText(item.getAudio1().getTitle());
         holder.button1.setOnClickListener(v -> play(item.getAudio1()));
 
+        // appui long pour supprimer si c'est un import
+        holder.button1.setOnLongClickListener(v -> {
+            Audio a = item.getAudio1();
+            if (a != null && a.isFromUri()) {
+                new androidx.appcompat.app.AlertDialog.Builder(context)
+                        .setTitle("Supprimer ce son ?")
+                        .setMessage(a.getTitle())
+                        .setPositiveButton("Supprimer", (d, w) -> action.onDelete(a))
+                        .setNegativeButton("Annuler", null)
+                        .show();
+                return true;
+            }
+            return false; // pas d'action si son par défaut
+        });
+
         // Bouton 2 (peut être null)
         if (item.getAudio2() == null) {
             holder.button2.setVisibility(View.GONE);
@@ -70,6 +87,20 @@ public class CustomAdapter extends BaseAdapter {
             holder.button2.setVisibility(View.VISIBLE);
             holder.button2.setText(item.getAudio2().getTitle());
             holder.button2.setOnClickListener(v -> play(item.getAudio2()));
+
+            holder.button2.setOnLongClickListener(v -> {
+                Audio a = item.getAudio2();
+                if (a != null && a.isFromUri()) {
+                    new androidx.appcompat.app.AlertDialog.Builder(context)
+                            .setTitle("Supprimer ce son ?")
+                            .setMessage(a.getTitle())
+                            .setPositiveButton("Supprimer", (d, w) -> action.onDelete(a))
+                            .setNegativeButton("Annuler", null)
+                            .show();
+                    return true;
+                }
+                return false;
+            });
         }
         return convertView;
     }
@@ -124,5 +155,9 @@ public class CustomAdapter extends BaseAdapter {
         this.listData.clear();
         this.listData.addAll(newData);
         notifyDataSetChanged();
+    }
+
+    public interface OnAudioAction {
+        void onDelete(Audio audio);
     }
 }
