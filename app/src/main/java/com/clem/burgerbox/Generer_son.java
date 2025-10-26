@@ -22,19 +22,21 @@ import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.util.Locale;
 
+// Imports nécessaires : TTS, MediaStore (sauvegarde dans Téléchargements), UI, I/O, Locale.
+
 public class Generer_son extends BaseActivity {
 
     // --- Réglages ---
-    private static final float RATE_MIN  = 0.05f;  // ex: 0.05x
-    private static final float RATE_MAX  = 3.00f;  // ex: 3.00x
-    private static final float PITCH_MIN = 0.25f;  // ex: 0.25x
-    private static final float PITCH_MAX = 3.00f;  // ex: 3.00x
+    private static final float RATE_MIN  = 0.05f;  // Vitesse minimale 0.05x (très lent)
+    private static final float RATE_MAX  = 3.00f;  // Vitesse max 3x
+    private static final float PITCH_MIN = 0.25f;  // Hauteur minimale 0.25x
+    private static final float PITCH_MAX = 3.00f;  // Hauteur max 3x
+    private TextToSpeech tts;                      // Moteur TTS
+    private boolean ttsReady = false;
 
-    private TextToSpeech tts;
-    private Button btnPlay, btnSave;
-    private EditText inputText;
-    private SeekBar seekRate, seekPitch;
-    private TextView tvRateLabel, tvPitchLabel;
+    private EditText inputText;                    // Champ de texte
+    private SeekBar seekRate, seekPitch;           // Sliders vitesse & hauteur
+    private TextView tvRateLabel, tvPitchLabel;    // Libellés
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -42,8 +44,8 @@ public class Generer_son extends BaseActivity {
         setActivityLayout(R.layout.generer_son);
 
         // --- Id du xml ---
-        btnPlay      = findViewById(R.id.btnPlay);
-        btnSave      = findViewById(R.id.btnSave);
+        Button btnPlay = findViewById(R.id.btnPlay);
+        Button btnSave = findViewById(R.id.btnSave);
         inputText    = findViewById(R.id.inputText);
         seekRate     = findViewById(R.id.seekRate);
         seekPitch    = findViewById(R.id.seekPitch);
@@ -51,13 +53,13 @@ public class Generer_son extends BaseActivity {
         tvPitchLabel = findViewById(R.id.tvPitchLabel);
 
         // --- SeekBars paramètres ---
+        // Les SeekBars vont de 0 à 200. Position initiale = 1.0x
         seekRate.setMax(200);
         seekPitch.setMax(200);
-        seekRate.setProgress(valueToProgress(1.0f, RATE_MIN, RATE_MAX));
-        seekPitch.setProgress(valueToProgress(1.0f, PITCH_MIN, PITCH_MAX));
+        seekRate.setProgress(valueToProgress(RATE_MIN, RATE_MAX));
+        seekPitch.setProgress(valueToProgress(PITCH_MIN, PITCH_MAX));
         tvRateLabel.setText(String.format(Locale.US, "Vitesse : %.2fx", progressToValue(seekRate.getProgress(), RATE_MIN, RATE_MAX)));
         tvPitchLabel.setText(String.format(Locale.US, "Pitch : %.2fx", progressToValue(seekPitch.getProgress(), PITCH_MIN, PITCH_MAX)));
-
 
         // --- SeekBars vitesse tracking ---
         seekRate.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -79,35 +81,53 @@ public class Generer_son extends BaseActivity {
             @Override public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
-        // --- TTS (Text-to-Speech) ---
+        // Initialise le moteur TTS (Text-to-Speech) et tente de régler la langue sur français (France).
+
+        setUiEnabled(false); // Désactive Play/Save tant que pas prêt
+
         tts = new TextToSpeech(this, status -> {
             if (status == TextToSpeech.SUCCESS) {
-                int res = tts.setLanguage(Locale.FRANCE);
-                if (res == TextToSpeech.LANG_MISSING_DATA || res == TextToSpeech.LANG_NOT_SUPPORTED) {
-                    Toast.makeText(this, "La langue FR n'est pas supportée par le moteur TTS.", Toast.LENGTH_LONG).show();
+                int res = tts.setLanguage(Locale.FRENCH); // ou new Locale("fr","FR")
+                if (res >= 0) {
+                    ttsReady = true;
+                    setUiEnabled(true);
+                } else {
+                    toast("Français non supporté par le moteur TTS.");
                 }
             } else {
-                Toast.makeText(this, "Échec de l'initialisation du TTS.", Toast.LENGTH_LONG).show();
+                toast("Échec de l'initialisation du TTS.");
             }
         });
 
-        // --- Actions ---
-        btnPlay.setOnClickListener(v -> playNow());
-        btnSave.setOnClickListener(v -> saveToDownloadsWav());
+        // --- Actions : lecture immédiate ou synthèse vers fichier ---
+        btnPlay.setOnClickListener(v -> {
+            if (!ttsReady) { toast("TTS non prêt."); return; }
+            playNow();
+        });
+        btnSave.setOnClickListener(v -> {
+            if (!ttsReady) { toast("TTS non prêt."); return; }
+            saveToDownloadsWav();
+        });
+    }
+
+    private void setUiEnabled(boolean enabled) {
+        findViewById(R.id.btnPlay).setEnabled(enabled);
+        findViewById(R.id.btnSave).setEnabled(enabled);
     }
 
     // --- Ajustement de la barre en fonction de la progression ---
     private float progressToValue(int progress, float min, float max) {
         return min + (progress / 200f) * (max - min);
     }
-    private int valueToProgress(float value, float min, float max) {
+    private int valueToProgress(float min, float max) {
+        float value = 1.0f;
         if (value < min) value = min;
         if (value > max) value = max;
         return Math.round(((value - min) / (max - min)) * 200f);
     }
 
 
-    // --- Lecture du son ---
+    // --- Lecture du son avec les réglages---
     private void playNow() {
         if (tts == null) { toast("TTS non prêt."); return; }
 
@@ -119,15 +139,23 @@ public class Generer_son extends BaseActivity {
         tts.setSpeechRate(rate);
         tts.setPitch(pitch);
 
+        // Installe un listener (basique) pour les callbacks.
         String utteranceId = "play-" + System.currentTimeMillis();
         tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
             @Override public void onStart(String id) {}
-            @Override public void onDone(String id) {}
-            @Override public void onError(String id) { runOnUiThread(() -> toast("Erreur de lecture.")); }
+            @Override public void onDone(String id) {
+                if (id.startsWith("save-")) {
+                    runOnUiThread(() -> toast("Fichier prêt (copie en cours si Android 10+)."));
+                }
+            }
+            @Override public void onError(String id) {
+                runOnUiThread(() -> toast(id.startsWith("save-") ? "Erreur de synthèse." : "Erreur de lecture."));
+            }
         });
 
         tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, utteranceId);
     }
+
 
     // --- Enregistrement du son dans le dossier Téléchargements ---
     private void saveToDownloadsWav() {
@@ -149,8 +177,8 @@ public class Generer_son extends BaseActivity {
         tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
             @Override public void onStart(String id) {}
 
+            // Fait une synthèse vers un fichier temporaire, puis copie le fichier vers Downloads via MediaStore (Android 10+).
             @Override public void onDone(String id) {
-                // Copie vers Téléchargements via MediaStore (Android 10+)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     try {
                         ContentResolver cr = getContentResolver();
@@ -166,15 +194,14 @@ public class Generer_son extends BaseActivity {
                              FileInputStream fis = new FileInputStream(tmp)) {
                             byte[] buf = new byte[8192];
                             int len;
-                            while ((len = fis.read(buf)) != -1) {
-                                os.write(buf, 0, len);
+                            if (os != null) {
+                                while ((len = fis.read(buf)) != -1) {
+                                    os.write(buf, 0, len);
+                                }
+                                os.flush();
                             }
-                            os.flush();
                         }
-
-                        // Nettoie le tmp
-                        tmp.delete();
-
+                        safeDelete(tmp);    // Nettoie le tmp
                         runOnUiThread(() -> toast("WAV enregistré dans Téléchargements : " + baseName));
                     } catch (Exception e) {
                         runOnUiThread(() -> toast("Échec de copie vers Téléchargements."));
@@ -194,7 +221,7 @@ public class Generer_son extends BaseActivity {
         }
     }
 
-    // --- Sécurise le texte ---
+    // --- Évite NullPointer et supprime les espaces.---
     private String safeText() {
         return inputText.getText() == null ? "" : inputText.getText().toString().trim();
     }
@@ -212,6 +239,13 @@ public class Generer_son extends BaseActivity {
             tts.stop();
             tts.shutdown();
             tts = null;
+        }
+    }
+    private void safeDelete(File f) {
+        if (f == null) return;
+        boolean ok = f.delete();
+        if (!ok && f.exists()) {
+            toast("Impossible de supprimer le fichier.");
         }
     }
 }
