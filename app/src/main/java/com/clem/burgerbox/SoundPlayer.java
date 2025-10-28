@@ -14,25 +14,25 @@ import java.util.Map;
 
 public class SoundPlayer {
 
-    private static SoundPlayer instance;
-    private final SoundPool soundPool;
-    private final SparseIntArray soundIds;
+    private static SoundPlayer instance;    //instance unique
+    private final SoundPool soundPool;      // moteur de lecteur
+    private final SparseIntArray soundIds;      //map des id de sons
     private final SparseBooleanArray toAutoPlay;
     private final Context appContext;
-
     private final Map<String, Integer> uriSoundIds = new HashMap<>();
 
 
     private SoundPlayer(Context context) {
         appContext = context.getApplicationContext();
-        AudioAttributes attrs = new AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_MEDIA)                // <- au lieu de USAGE_ASSISTANCE_SONIFICATION
-                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+        AudioAttributes attrs = new AudioAttributes.Builder()     // décrit à quoi sert le son
+                .setUsage(AudioAttributes.USAGE_MEDIA)
+                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)     // Type de contenu
                 .build();
 
+        // SoundPool est une classe Android prévue pour jouer des sons courts
         soundPool = new SoundPool.Builder()
                 .setAudioAttributes(attrs)
-                .setMaxStreams(8)
+                .setMaxStreams(8)            // Nombre max de sons simultanés
                 .build();
         soundIds = new SparseIntArray();
         toAutoPlay = new SparseBooleanArray();
@@ -46,12 +46,13 @@ public class SoundPlayer {
         });
     }
 
+    // Méthode d’accès singleton
     public static synchronized SoundPlayer get(Context context) {
         if (instance == null) instance = new SoundPlayer(context);
         return instance;
     }
 
-    // charge et joue quand prêt
+    // Charge un son par resId et le joue quand il est prêt
     public void play(int resId) {
         int soundId = soundIds.get(resId, -1);
         if (soundId == -1) {
@@ -62,6 +63,8 @@ public class SoundPlayer {
             soundPool.play(soundId, 1f, 1f, 1, 0, 1f);
         }
     }
+
+    // Variante : joue un son pointé par une Uri (fichier, MediaStore, etc.)
     public void play(Uri uri) {
         String key = uri.toString();
         Integer existing = uriSoundIds.get(key);
@@ -69,6 +72,7 @@ public class SoundPlayer {
             soundPool.play(existing, 1f, 1f, 1, 0, 1f);
             return;
         }
+        // Pas encore chargé : on ouvre un descripteur de fichier sur l’URI
         try (AssetFileDescriptor afd = appContext.getContentResolver()
                 .openAssetFileDescriptor(uri, "r")) {
             if (afd == null) return;
@@ -80,7 +84,7 @@ public class SoundPlayer {
         }
     }
 
-
+    // Libère les ressources natives de SoundPool
     public void release() {
         soundPool.release();
         instance = null;

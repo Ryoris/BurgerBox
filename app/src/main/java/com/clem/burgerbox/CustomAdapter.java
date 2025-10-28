@@ -15,10 +15,10 @@ import java.util.ArrayList;
 
 // CustomAdapter est l’adaptateur qui connecte la donnée (ArrayList<TwoAudio>) à la vue (ListView).
 public class CustomAdapter extends BaseAdapter {
-    private final ArrayList<TwoAudio> listData;
+    private final ArrayList<TwoAudio> listData;     // la source de données : chaque item = 2 boutons/sons potentiels
     private final LayoutInflater layoutInflater;
     private final Context context;
-    private final OnAudioAction action;
+    private final OnAudioAction action;     // callbacks (ici: suppression d’un son importé)
 
     public CustomAdapter(Context context, ArrayList<TwoAudio> listData, OnAudioAction action) {
         this.listData = listData;
@@ -110,7 +110,7 @@ public class CustomAdapter extends BaseAdapter {
         return convertView;
     }
 
-    // Lance la lecture du son
+    // Lance la lecture du son par titre
     private void playByTitle(String title) {
         // check le volume avant de lancer le son
         AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
@@ -127,6 +127,7 @@ public class CustomAdapter extends BaseAdapter {
         }
     }
 
+    // Lecture générique de son
     private void play(Audio audio) {
         AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         if (am != null && am.getStreamVolume(AudioManager.STREAM_MUSIC) == 0) {
@@ -140,7 +141,6 @@ public class CustomAdapter extends BaseAdapter {
             playByTitle(audio.getTitle());
         }
     }
-
 
     // Correspondance entre l'id et le nom
     @SuppressLint("DiscouragedApi")
@@ -156,16 +156,18 @@ public class CustomAdapter extends BaseAdapter {
         Button button1;
         Button button2;
     }
+
+    // Mise à jour de la liste
     public void updateData(ArrayList<TwoAudio> newData) {
         this.listData.clear();
         this.listData.addAll(newData);
         notifyDataSetChanged();
     }
 
+    // Callback d’action
     public interface OnAudioAction {
         void onDelete(Audio audio);
     }
-
 
     // Formate les noms des audios
     // Transforme "big_bell" -> "Big Bell", "AIR-HORN" -> "Air Horn"
